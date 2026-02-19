@@ -13,11 +13,11 @@
       ],
       "ConstraintDescription": "Must be t2.micro or t2.small."
     },
-    "KeyPairName": {
+    "KeyPair": {
       "Description": "Name of your EC2 keypair",
       "Type": "AWS::EC2::KeyPair::KeyName"
     },
-    "YourIP": {
+    "YourIp": {
       "Description": "Your public IP address (x.x.x.x/32)",
       "Type": "String"
     }
@@ -106,9 +106,8 @@
     "WebserversSG": {
       "Type": "AWS::EC2::SecurityGroup",
       "Properties": {
-        "GroupName": "WebserversSG",
-        "VpcId": { "Ref": "EngineeringVpc" },
         "GroupDescription": "Allow HTTP and SSH",
+        "VpcId": { "Ref": "EngineeringVpc" },
         "SecurityGroupIngress": [
           {
             "IpProtocol": "tcp",
@@ -120,7 +119,7 @@
             "IpProtocol": "tcp",
             "FromPort": 22,
             "ToPort": 22,
-            "CidrIp": { "Ref": "YourIP" }
+            "CidrIp": { "Ref": "YourIp" }
           }
         ]
       }
@@ -129,14 +128,14 @@
     "web1": {
       "Type": "AWS::EC2::Instance",
       "Properties": {
-        "KeyName": { "Ref": "KeyPairName" },
+        "KeyName": { "Ref": "KeyPair" },
         "InstanceType": { "Ref": "InstanceType" },
         "ImageId": "ami-01cc34ab2709337aa",
         "SubnetId": { "Ref": "PublicSubnet1" },
         "SecurityGroupIds": [{ "Ref": "WebserversSG" }],
         "UserData": {
           "Fn::Base64": {
-            "Fn::Sub": "#!/bin/bash\nyum update -y\nyum install -y git httpd php\nsystemctl start httpd\nsystemctl enable httpd\necho \"<h1>Web Server 1</h1>\" > /var/www/html/index.html\n"
+            "Fn::Sub": "#!/bin/bash\nyum update -y\nyum install -y git httpd php\nservice httpd start\nchkconfig httpd on\naws s3 cp s3://seis665-public/index.php /var/www/html/\n"
           }
         },
         "Tags": [{ "Key": "Name", "Value": "web1" }]
@@ -146,14 +145,14 @@
     "web2": {
       "Type": "AWS::EC2::Instance",
       "Properties": {
-        "KeyName": { "Ref": "KeyPairName" },
+        "KeyName": { "Ref": "KeyPair" },
         "InstanceType": { "Ref": "InstanceType" },
         "ImageId": "ami-01cc34ab2709337aa",
         "SubnetId": { "Ref": "PublicSubnet2" },
         "SecurityGroupIds": [{ "Ref": "WebserversSG" }],
         "UserData": {
           "Fn::Base64": {
-            "Fn::Sub": "#!/bin/bash\nyum update -y\nyum install -y git httpd php\nsystemctl start httpd\nsystemctl enable httpd\necho \"<h1>Web Server 2</h1>\" > /var/www/html/index.html\n"
+            "Fn::Sub": "#!/bin/bash\nyum update -y\nyum install -y git httpd php\nservice httpd start\nchkconfig httpd on\naws s3 cp s3://seis665-public/index.php /var/www/html/\n"
           }
         },
         "Tags": [{ "Key": "Name", "Value": "web2" }]
@@ -178,7 +177,6 @@
     "EngineeringLB": {
       "Type": "AWS::ElasticLoadBalancingV2::LoadBalancer",
       "Properties": {
-        "Name": "EngineeringLB",
         "Scheme": "internet-facing",
         "Type": "application",
         "Subnets": [
