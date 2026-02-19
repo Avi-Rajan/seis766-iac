@@ -134,6 +134,11 @@
         "ImageId": "ami-01cc34ab2709337aa",
         "SubnetId": { "Ref": "PublicSubnet1" },
         "SecurityGroupIds": [{ "Ref": "WebserversSG" }],
+        "UserData": {
+          "Fn::Base64": {
+            "Fn::Sub": "#!/bin/bash\nyum update -y\nyum install -y git httpd php\nsystemctl start httpd\nsystemctl enable httpd\necho \"<h1>Web Server 1</h1>\" > /var/www/html/index.html\n"
+          }
+        },
         "Tags": [{ "Key": "Name", "Value": "web1" }]
       }
     },
@@ -146,6 +151,11 @@
         "ImageId": "ami-01cc34ab2709337aa",
         "SubnetId": { "Ref": "PublicSubnet2" },
         "SecurityGroupIds": [{ "Ref": "WebserversSG" }],
+        "UserData": {
+          "Fn::Base64": {
+            "Fn::Sub": "#!/bin/bash\nyum update -y\nyum install -y git httpd php\nsystemctl start httpd\nsystemctl enable httpd\necho \"<h1>Web Server 2</h1>\" > /var/www/html/index.html\n"
+          }
+        },
         "Tags": [{ "Key": "Name", "Value": "web2" }]
       }
     },
