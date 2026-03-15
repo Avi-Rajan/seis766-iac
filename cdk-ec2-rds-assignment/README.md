@@ -1,58 +1,27 @@
+Requirements:
 
-# Welcome to your CDK Python project!
+- A network stack contains:
+- One public and one private subnets in one availability zone
+- One public and one private subnets in another availability zone
+- A server stack:
+- Launch one web server in each public subnets
+- A RDS instance with MySQL engine with all private subnets as its subnet
+group.
+- Web servers' security group opens port 80 from anywhere
+- RDS instance's security group opens port 3306 to only web servers'
+security group
 
-This is a blank project for CDK development with Python.
+Architecture
 
-The `cdk.json` file tells the CDK Toolkit how to execute your app.
+VPC
+  AZ1
+    Public Subnet → EC2 Web Server
+    Private Subnet → RDS
 
-This project is set up like a standard Python project.  The initialization
-process also creates a virtualenv within this project, stored under the `.venv`
-directory.  To create the virtualenv it assumes that there is a `python3`
-(or `python` for Windows) executable in your path with access to the `venv`
-package. If for any reason the automatic creation of the virtualenv fails,
-you can create the virtualenv manually.
+  AZ2
+    Public Subnet → EC2 Web Server
+    Private Subnet → RDS
 
-To manually create a virtualenv on MacOS and Linux:
-
-```
-$ python -m venv .venv
-```
-
-After the init process completes and the virtualenv is created, you can use the following
-step to activate your virtualenv.
-
-```
-$ source .venv/bin/activate
-```
-
-If you are a Windows platform, you would activate the virtualenv like this:
-
-```
-% .venv\Scripts\activate.bat
-```
-
-Once the virtualenv is activated, you can install the required dependencies.
-
-```
-$ pip install -r requirements.txt
-```
-
-At this point you can now synthesize the CloudFormation template for this code.
-
-```
-$ cdk synth
-```
-
-To add additional dependencies, for example other CDK libraries, just add
-them to your `requirements.txt` file and rerun the `python -m pip install -r requirements.txt`
-command.
-
-## Useful commands
-
- * `cdk ls`          list all stacks in the app
- * `cdk synth`       emits the synthesized CloudFormation template
- * `cdk deploy`      deploy this stack to your default AWS account/region
- * `cdk diff`        compare deployed stack with current state
- * `cdk docs`        open CDK documentation
-
-Enjoy!
+Security
+  HTTP (80) open to internet
+  MySQL (3306) only from web servers
