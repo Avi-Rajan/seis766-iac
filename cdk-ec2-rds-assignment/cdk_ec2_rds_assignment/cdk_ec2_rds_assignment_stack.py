@@ -41,17 +41,18 @@ class CdkEc2RdsAssignmentStack(Stack):
             ec2.Port.tcp(3306)
         )
 
-        ec2.Instance(
-            self,
-            "WebServer",
-            vpc=vpc,
-            instance_type=ec2.InstanceType("t2.micro"),
-            machine_image=ec2.AmazonLinuxImage(),
-            security_group=web_sg,
-            vpc_subnets=ec2.SubnetSelection(
-                subnet_type=ec2.SubnetType.PUBLIC
+        for i in range(2):
+            ec2.Instance(
+                self,
+                f"WebServer{i+1}",
+                vpc=vpc,
+                instance_type=ec2.InstanceType("t2.micro"),
+                machine_image=ec2.AmazonLinuxImage(),
+                security_group=web_sg,
+                vpc_subnets=ec2.SubnetSelection(
+                    subnet_type=ec2.SubnetType.PUBLIC
+                )
             )
-        )
 
         rds.DatabaseInstance(
             self,
